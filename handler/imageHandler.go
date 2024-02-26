@@ -1,7 +1,7 @@
 // Package handler /*
 /*
 ## License
-This project is licensed under the APACHE Licence. Refer to https://github.com/mstgnz/go-minio-cdn/blob/main/LICENSE for more information.
+This project is licensed under the APACHE Licence. Refer to github.com/BTDevelop/go-cdn/blob/main/LICENSE for more information.
 */
 package handler
 
@@ -13,9 +13,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/BTDevelop/go-cdn/service"
 	"github.com/gofiber/fiber/v2"
 	"github.com/minio/minio-go/v7"
-	"github.com/mstgnz/go-minio-cdn/service"
 )
 
 type File interface {
@@ -32,40 +32,36 @@ type file struct {
 }
 
 func NewFile(minioService *minio.Client) File {
-	return &file {
+	return &file{
 		minioService: *minioService,
 	}
 }
 
 func (i file) GetFile(c *fiber.Ctx) error {
-    ctx := context.Background()
-    bucket := c.Params("bucket")
-    objectName := c.Params("*")
+	ctx := context.Background()
+	bucket := c.Params("bucket")
+	objectName := c.Params("*")
 
-    // Bucket kontrolü
-    if found, err := i.minioService.BucketExists(ctx, bucket); !found || err != nil {
-        return c.SendFile("./public/notfound.png") // Veya daha genel bir hata mesajı
-    }
+	// Bucket check
+	if found, err := i.minioService.BucketExists(ctx, bucket); !found || err != nil {
+		return c.SendFile("./public/notfound.png") // Veya daha genel bir hata mesajı
+	}
 
-    // MinIO'dan nesneyi al
-    object, err := i.minioService.GetObject(ctx, bucket, objectName, minio.GetObjectOptions{})
-    if err != nil {
-        return c.SendFile("./public/notfound.png") // Veya daha genel bir hata mesajı
-    }
+	object, err := i.minioService.GetObject(ctx, bucket, objectName, minio.GetObjectOptions{})
+	if err != nil {
+		return c.SendFile("./public/notfound.png") // Veya daha genel bir hata mesajı
+	}
 
-    // Byte olarak oku
-    byteContent := service.StreamToByte(object)
-    if len(byteContent) == 0 {
-        return c.SendFile("./public/notfound.png") // Veya daha genel bir hata mesajı
-    }
+	byteContent := service.StreamToByte(object)
+	if len(byteContent) == 0 {
+		return c.SendFile("./public/notfound.png") // Veya daha genel bir hata mesajı
+	}
 
-    // MIME türüne göre işlem yap
-    contentType := http.DetectContentType(byteContent)
-    c.Set("Content-Type", contentType)
+	contentType := http.DetectContentType(byteContent)
+	c.Set("Content-Type", contentType)
 	c.Set("Cache-Control", "max-age=2592000, public")
-	
-    // Diğer türler için (JS, CSS vb.) orijinal içeriği gönder
-    return c.Send(byteContent)
+
+	return c.Send(byteContent)
 }
 
 func (i file) GetImage(c *fiber.Ctx) error {
@@ -359,17 +355,6 @@ func (i file) UploadImageWithUrl(c *fiber.Ctx) error {
 
 	// Upload with PutObject
 	minioResult, err := i.minioService.PutObject(ctx, bucket, objectName, res.Body, int64(fileSize), minio.PutObjectOptions{ContentType: contentType})
-
-	// link := "https://cdn.destechhasar.com/" + bucket + "/" + objectName
-
-	// // S3 upload with glacier storage class
-	// awsResult, err := i.awsService.S3PutObject(bucket, objectName, res.Body)
-
-	// awsErr := fmt.Sprintf("S3 Successfully Uploaded")
-
-	// if err != nil {
-	// 	awsErr = fmt.Sprintf("S3 Failed Uploaded %s", err.Error())
-	// }
 
 	return c.JSON(fiber.Map{
 		"error":       false,

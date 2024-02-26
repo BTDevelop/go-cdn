@@ -1,5 +1,7 @@
-## CDN API with Go and MinIO
+## go cdn
 #### Create your own Cdn service on Minio and Aws with Golang.
+
+![go cdn](/public/logo.png)
 
 ### Overview
 
@@ -9,14 +11,13 @@ This project allows you to create your own Content Delivery Network (CDN) servic
 Before you get started, make sure you have the following prerequisites installed on your computer:
 * [Docker](https://www.docker.com/): You will need Docker to run this project.
 
-
 ### Installation
 
 Follow these steps to set up and run the project:
 
 1- Clone the repository:
 ```bash
-git clone https://github.com/mstgnz/go-minio-cdn.git
+git clone https://github.com/BTDevelop/go-cdn.git
 ```
 2- Rename the .env.example file to .env and enter the required information.
 3- Start the project with Docker Compose:
@@ -99,4 +100,4 @@ This project is open-source, and contributions are welcome. Feel free to contrib
 
 
 ### License
-This project is licensed under the Apache License. See the [LICENSE](https://github.com/mstgnz/go-minio-cdn/blob/main/LICENSE) file for more details.
+This project is licensed under the Apache License. See the [LICENSE](github.com/BTDevelop/go-cdn/blob/main/LICENSE) file for more details.
